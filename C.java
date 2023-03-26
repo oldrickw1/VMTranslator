@@ -1,0 +1,3 @@
+public enum C {
+    ARITHMETIC, PUSH, POP, LABEL, GOTO, IF, FUNCTION, RETURN, CALL;
+}

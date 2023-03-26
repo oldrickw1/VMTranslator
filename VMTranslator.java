@@ -1,5 +1,4 @@
 import java.io.IOException;
-import java.util.stream.Stream;
 
 public class VMTranslator {
     public static void main(String[] args) throws IOException {
@@ -7,12 +6,15 @@ public class VMTranslator {
         Parser parser = new Parser(filePath);
         CodeWriter codeWriter = new CodeWriter("./foo.asm");
 
-        Command command = null;
 
-        while((command = parser.getNextCommand()) != null) {
-            codeWriter.encode(command);
-            break;
+        while(parser.hasMoreLines()) {
+            parser.advance();
+            switch (parser.getCommandType()) {
+                case ARITHMETIC -> codeWriter.writeArithmetic(parser.getArg1());
+                case PUSH, POP -> codeWriter.writePushPop(parser.getCommandType(), parser.getArg1(), parser.getArg2(), parser.getCommand());
+            }
         }
+        codeWriter.close();
 
     }
 }

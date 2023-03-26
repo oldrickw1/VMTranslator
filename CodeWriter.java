@@ -1,4 +1,3 @@
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -10,18 +9,15 @@ public class CodeWriter {
         writer = new BufferedWriter(new FileWriter(outputFile));
     }
 
-    public void encode(Command command) {
-        switch (command.getType()) {
-            case C_ARITHMETIC -> System.out.println("Arithmetic");
-            case C_PUSH -> System.out.println("Push");
-            case C_POP -> System.out.println("Pop");
-            case C_IF -> System.out.println("If");
-            case C_CALL -> System.out.println("Call");
-            case C_FUNCTION -> System.out.println("Function");
-            case C_GOTO -> System.out.println("Goto");
-            case C_LABEL -> System.out.println("Label");
-            case C_RETURN -> System.out.println("Return");
-        }
+    public void writeArithmetic(String arg1) throws IOException {
+        writer.write("// " + arg1 + "\n");
+    }
 
+    public void writePushPop(C commandType, String arg1, String arg2, String commandForComment) throws IOException {
+        writer.write("// " + commandForComment + "\n");
+    }
+
+    public void close() throws IOException {
+        writer.close();
     }
 }
