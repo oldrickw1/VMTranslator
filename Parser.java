@@ -1,6 +1,7 @@
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class Parser {
     private List<String> commands = new ArrayList<>();
@@ -73,16 +74,7 @@ public class Parser {
     }
 
     private boolean isArithmeticInstruction() {
-        String s = currentCommand;
-        return (s.contains("add") ||
-                s.contains("sub") ||
-                s.contains("neg") ||
-                s.contains("eq")  ||
-                s.contains("gt")  ||
-                s.contains("lt")  ||
-                s.contains("and") ||
-                s.contains("or")  ||
-                s.contains("not"));
+        return Set.of("add", "sub", "neg", "eq", "gt", "lt", "and", "or", "not").stream().anyMatch(currentCommand::contains);
     }
 
     private boolean isWhitespaceOrCommand(String s) {
