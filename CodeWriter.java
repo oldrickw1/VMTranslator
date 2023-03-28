@@ -30,23 +30,220 @@ public class CodeWriter {
     public void writePushPop(C commandType, String segment, String index, String commandForComment) throws IOException {
         writer.write("// " + commandForComment + "\n");
         switch (commandType) {
-            case C.PUSH -> writer.write(make);
+            case PUSH -> writer.write(generatePushAssembly(segment, index));
+            case POP  -> writer.write(generatePopAssembly(segment, index));
         }
+    }
 
+    private String generatePopAssembly(String segment, String index) {
+        switch (segment) {
+            case "argument" -> {
+                return  """
+                        @ARG
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        @a
+                        M=D
+                        
+                        @SP
+                        A=M
+                        D=M
+                        @a
+                        A=M
+                        M=D
+                        """;
+            }
+            case "local" -> {
+                return """
+                        @LCL
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        @a
+                        M=D
+                        
+                        @SP
+                        A=M
+                        D=M
+                        @a
+                        A=M
+                        M=D
+                        """;
+            }
+            case "static" -> {
+                return  """
+                        TODOOOOO
+                        """;
+            }
+            case "this" -> {
+                return """
+                        @THIS
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        @a
+                        M=D
+                        
+                        @SP
+                        A=M
+                        D=M
+                        @a
+                        A=M
+                        M=D
+                        """;
+            }
+            case "that" -> {
+                return """
+                        @THAT
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        @a
+                        M=D
+                        
+                        @SP
+                        A=M
+                        D=M
+                        @a
+                        A=M
+                        M=D
+                        """;
+            }
+            case "pointer" -> {
+                return """
+                        @3
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        @a
+                        M=D
+                        
+                        @SP
+                        A=M
+                        D=M
+                        @a
+                        A=M
+                        M=D
+                        """;
+            }
+            case "temp" -> {
+                return """
+                        @TEMP
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        @a
+                        M=D
+                        
+                        @SP
+                        A=M
+                        D=M
+                        @a
+                        A=M
+                        M=D
+                        """;
+            }
+        }
+        return "";
+    }
+
+    private String generatePushAssembly(String segment, String index) {
+        System.out.println("Segment: " + segment);
+        switch (segment) {
+            case "argument" -> {
+                return """
+                        @ARG
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        """ + PUSH_LAST;
+            }
+            case "local" -> {
+                return """
+                        @LCL
+                        D=M
+                        @"""+index+
+                        """
+                        \nD=D+A
+                        """ + PUSH_LAST;
+            }
+            case "static" -> {
+                return  """
+                        TODOOOOO
+                        """;
+            }
+            case "constant" -> {
+                return """
+                        @"""+index+
+                        """
+                        D=A
+                        """ + PUSH_LAST;
+            }
+            case "this" -> {
+                return """
+                        @THIS
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        """ + PUSH_LAST;
+            }
+            case "that" -> {
+                return """
+                        @THAT
+                        D=M
+                        @"""+index+
+                        """
+                        D=D+A
+                        """ + PUSH_LAST;
+            }
+            case "pointer" -> {
+                return """
+                        @3
+                        D=A
+                        @"""+index+
+                        """
+                        A=D+A
+                        D=M
+                        """ + PUSH_LAST;
+            }
+            case "temp" -> {
+                return """
+                        @TEMP
+                        D=A
+                        @"""+index+
+                        """
+                        A=D+A
+                        D=M
+                        """ + PUSH_LAST;
+            }
+        }
+        return "ERROR";
     }
 
     public void close() throws IOException {
+        writer.write(ENDLOOP);
         writer.close();
     }
 
-    String POP_LAST = """
+    String POP_LAST =
+            """
             @SP
             M=M-1
             A=M
             D=M
             """;
 
-    String PUSH_LAST = """
+    String PUSH_LAST =
+            """
             @SP
             A=M
             M=D
@@ -54,23 +251,28 @@ public class CodeWriter {
             M=M+1
             """;
 
-    String AND  = POP_LAST + """
+    String AND  = POP_LAST +
+            """
             @a
             M=D
-            """ + POP_LAST + """
+            """ + POP_LAST +
+            """
             D=M&D
             """
             + PUSH_LAST;
 
-    String OR = POP_LAST + """
+    String OR = POP_LAST +
+            """
             @a
             M=D
-            """ + POP_LAST + """
+            """ + POP_LAST +
+            """
             D=M|D
             """
             + PUSH_LAST;
 
-    String NOT = POP_LAST + """
+    String NOT = POP_LAST +
+            """
             D=!D
             """
             + PUSH_LAST;
