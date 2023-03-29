@@ -9,7 +9,7 @@ public class CodeWriter {
 
     public CodeWriter(String outputFile) throws IOException {
         writer = new BufferedWriter(new FileWriter(outputFile));
-        System.out.println(EQ);
+        System.out.println(NOT);
     }
 
     public void writeArithmetic(String arg1) throws IOException {
@@ -43,10 +43,9 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         @a
                         M=D
-                        
                         @SP
                         A=M
                         D=M
@@ -61,10 +60,9 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         @a
                         M=D
-                        
                         @SP
                         A=M
                         D=M
@@ -84,10 +82,9 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         @a
                         M=D
-                        
                         @SP
                         A=M
                         D=M
@@ -102,10 +99,9 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         @a
                         M=D
-                        
                         @SP
                         A=M
                         D=M
@@ -120,10 +116,9 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         @a
                         M=D
-                        
                         @SP
                         A=M
                         D=M
@@ -138,10 +133,9 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         @a
                         M=D
-                        
                         @SP
                         A=M
                         D=M
@@ -155,7 +149,6 @@ public class CodeWriter {
     }
 
     private String generatePushAssembly(String segment, String index) {
-        System.out.println("Segment: " + segment);
         switch (segment) {
             case "argument" -> {
                 return """
@@ -163,7 +156,7 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         """ + PUSH_LAST;
             }
             case "local" -> {
@@ -171,7 +164,7 @@ public class CodeWriter {
                         @LCL
                         D=M
                         @"""+index+
-                        """
+                        """                        
                         \nD=D+A
                         """ + PUSH_LAST;
             }
@@ -184,7 +177,7 @@ public class CodeWriter {
                 return """
                         @"""+index+
                         """
-                        D=A
+                        \nD=A
                         """ + PUSH_LAST;
             }
             case "this" -> {
@@ -193,7 +186,7 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         """ + PUSH_LAST;
             }
             case "that" -> {
@@ -202,7 +195,7 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        D=D+A
+                        \nD=D+A
                         """ + PUSH_LAST;
             }
             case "pointer" -> {
@@ -211,7 +204,7 @@ public class CodeWriter {
                         D=A
                         @"""+index+
                         """
-                        A=D+A
+                        \nA=D+A
                         D=M
                         """ + PUSH_LAST;
             }
@@ -221,7 +214,7 @@ public class CodeWriter {
                         D=A
                         @"""+index+
                         """
-                        A=D+A
+                        \nA=D+A
                         D=M
                         """ + PUSH_LAST;
             }
@@ -257,6 +250,7 @@ public class CodeWriter {
             M=D
             """ + POP_LAST +
             """
+            @a
             D=M&D
             """
             + PUSH_LAST;
@@ -267,6 +261,7 @@ public class CodeWriter {
             M=D
             """ + POP_LAST +
             """
+            @a
             D=M|D
             """
             + PUSH_LAST;
