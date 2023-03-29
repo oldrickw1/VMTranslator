@@ -9,7 +9,7 @@ public class CodeWriter {
 
     public CodeWriter(String outputFile) throws IOException {
         writer = new BufferedWriter(new FileWriter(outputFile));
-        System.out.println(NOT);
+        System.out.println(SUB);
     }
 
     public void writeArithmetic(String arg1) throws IOException {
@@ -227,7 +227,7 @@ public class CodeWriter {
         writer.close();
     }
 
-    String POP_LAST =
+    String POP_LAST = // passed
             """
             @SP
             M=M-1
@@ -235,7 +235,7 @@ public class CodeWriter {
             D=M
             """;
 
-    String PUSH_LAST =
+    String PUSH_LAST = // passed
             """
             @SP
             A=M
@@ -244,7 +244,7 @@ public class CodeWriter {
             M=M+1
             """;
 
-    String AND  = POP_LAST +
+    String AND  = POP_LAST + // passed
             """
             @a
             M=D
@@ -255,7 +255,7 @@ public class CodeWriter {
             """
             + PUSH_LAST;
 
-    String OR = POP_LAST +
+    String OR = POP_LAST + // passed
             """
             @a
             M=D
@@ -266,18 +266,18 @@ public class CodeWriter {
             """
             + PUSH_LAST;
 
-    String NOT = POP_LAST +
+    String NOT = POP_LAST + // passed
             """
             D=!D
             """
             + PUSH_LAST;
 
-    String GT = POP_LAST +
+    String GT = POP_LAST + // passed
             """
             @SP
             M=M-1
             A=M
-            D=D-M
+            D=M-D
             @GREATER
             D;JGT
             D=0
@@ -287,7 +287,7 @@ public class CodeWriter {
             @END
             0;JMP
             (GREATER)
-            D=1
+            D=-1
             """ +
             PUSH_LAST +
             """
@@ -295,22 +295,22 @@ public class CodeWriter {
             """;
 
 
-    String LT = POP_LAST +
+    String LT = POP_LAST + // passed
             """
             @SP
             M=M-1
             A=M
-            D=M-D
+            D=D-M
             @LESS
             D;JLE
-            D=-1
+            D=0
             """ +
             PUSH_LAST +
             """
             @END
             0;JMP
             (LESS)
-            D=0
+            D=-1
             """ +
             PUSH_LAST +
             """
@@ -318,7 +318,7 @@ public class CodeWriter {
             """;
 
 
-    String EQ = POP_LAST +
+    String EQ = POP_LAST + // passed
             """
             @SP
             M=M-1
@@ -326,27 +326,28 @@ public class CodeWriter {
             D=D-M
             @NOT_EQUAL
             D;JNE
+            D=-1
             """ +
             PUSH_LAST +
             """
             @END
             0;JMP
             (NOT_EQUAL)
-            D=-1
+            D=0
             """ +
             PUSH_LAST +
             """ 
             (END) 
             """;
 
-    String NEG = POP_LAST+
+    String NEG = POP_LAST+ // passed
             """
             D=-D
             """ +
             PUSH_LAST;
 
 
-    String ADD = POP_LAST+
+    String ADD = POP_LAST+ // passed
             """
             @a
             M=D
@@ -359,7 +360,7 @@ public class CodeWriter {
             PUSH_LAST;
 
 
-    String SUB = POP_LAST +
+    String SUB = POP_LAST + // passed
             """
             @a
             M=D
@@ -376,6 +377,4 @@ public class CodeWriter {
             @END
             0;JMP
             """;
-
-
 }
