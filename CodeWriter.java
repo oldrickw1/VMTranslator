@@ -1,7 +1,6 @@
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.invoke.SwitchPoint;
 
 public class CodeWriter {
     BufferedWriter writer;
@@ -9,7 +8,7 @@ public class CodeWriter {
 
     public CodeWriter(String outputFile) throws IOException {
         writer = new BufferedWriter(new FileWriter(outputFile));
-        System.out.println(SUB);
+        System.out.println(generatePushAssembly("static", "4", "foo"));
     }
 
     public void writeArithmetic(String arg1) throws IOException {
@@ -27,26 +26,27 @@ public class CodeWriter {
         }
     }
 
-    public void writePushPop(C commandType, String segment, String index, String commandForComment) throws IOException {
+    public void writePushPop(C commandType, String segment, String index, String commandForComment, String filePath) throws IOException {
         writer.write("// " + commandForComment + "\n");
         switch (commandType) {
-            case PUSH -> writer.write(generatePushAssembly(segment, index));
-            case POP  -> writer.write(generatePopAssembly(segment, index));
+            case PUSH -> writer.write(generatePushAssembly(segment, index, filePath));
+            case POP  -> writer.write(generatePopAssembly(segment, index, filePath));
         }
     }
 
-    private String generatePopAssembly(String segment, String index) {
+    private String generatePopAssembly(String segment, String index, String filePath) {
         switch (segment) {
-            case "argument" -> {
+            case "argument" -> { // passed
                 return  """
                         @ARG
-                        D=M
+                        D=M 
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nD=D+A 
                         @a
                         M=D
                         @SP
+                        M=M-1
                         A=M
                         D=M
                         @a
@@ -57,35 +57,32 @@ public class CodeWriter {
             case "local" -> {
                 return """
                         @LCL
-                        D=M
+                        D=M 
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nD=D+A 
                         @a
                         M=D
                         @SP
+                        M=M-1
                         A=M
                         D=M
                         @a
                         A=M
                         M=D
-                        """;
-            }
-            case "static" -> {
-                return  """
-                        TODOOOOO
                         """;
             }
             case "this" -> {
                 return """
                         @THIS
-                        D=M
+                        D=M 
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nD=D+A 
                         @a
                         M=D
                         @SP
+                        M=M-1
                         A=M
                         D=M
                         @a
@@ -96,30 +93,46 @@ public class CodeWriter {
             case "that" -> {
                 return """
                         @THAT
-                        D=M
+                        D=M 
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nD=D+A 
                         @a
                         M=D
                         @SP
+                        M=M-1
                         A=M
                         D=M
                         @a
                         A=M
+                        M=D
+                        """;
+            }
+            case "static" -> { // passed
+                return
+                        """
+                        @SP
+                        M=M-1
+                        A=M
+                        D=M
+                        """
+                        +"@" +
+                        filePath + "." + index + "\n" +
+                        """
                         M=D
                         """;
             }
             case "pointer" -> {
                 return """
                         @3
-                        D=M
+                        D=A
                         @"""+index+
                         """
                         \nD=D+A
                         @a
                         M=D
                         @SP
+                        M=M-1
                         A=M
                         D=M
                         @a
@@ -127,16 +140,17 @@ public class CodeWriter {
                         M=D
                         """;
             }
-            case "temp" -> {
+            case "temp" -> { // passed
                 return """
-                        @TEMP
-                        D=M
+                        @5
+                        D=A
                         @"""+index+
                         """
                         \nD=D+A
                         @a
                         M=D
                         @SP
+                        M=M-1
                         A=M
                         D=M
                         @a
@@ -148,15 +162,16 @@ public class CodeWriter {
         return "";
     }
 
-    private String generatePushAssembly(String segment, String index) {
+    private String generatePushAssembly(String segment, String index, String filePath) {
         switch (segment) {
-            case "argument" -> {
+            case "argument" -> { // passed
                 return """
                         @ARG
                         D=M
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nA=D+A
+                        D=M
                         """ + PUSH_LAST;
             }
             case "local" -> {
@@ -166,12 +181,14 @@ public class CodeWriter {
                         @"""+index+
                         """                        
                         \nD=D+A
+                        D=M
                         """ + PUSH_LAST;
             }
-            case "static" -> {
-                return  """
-                        TODOOOOO
-                        """;
+            case "static" -> { // passed
+                return  "@" + filePath + "." + index + "\n" +
+                        """
+                        D=M
+                        """ + PUSH_LAST;
             }
             case "constant" -> {
                 return """
@@ -186,7 +203,8 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nA=D+A
+                        D=M
                         """ + PUSH_LAST;
             }
             case "that" -> {
@@ -195,7 +213,8 @@ public class CodeWriter {
                         D=M
                         @"""+index+
                         """
-                        \nD=D+A
+                        \nA=D+A
+                        D=M
                         """ + PUSH_LAST;
             }
             case "pointer" -> {
@@ -210,11 +229,12 @@ public class CodeWriter {
             }
             case "temp" -> {
                 return """
-                        @TEMP
+                        @5
                         D=A
                         @"""+index+
                         """
                         \nA=D+A
+                        A=M
                         D=M
                         """ + PUSH_LAST;
             }
